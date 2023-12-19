@@ -26,8 +26,8 @@ pipeline {
                     withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]) {
                         
                         // Set environment variables
-                        env.DOCKER_USERNAME = sh(script: 'echo $dockerHubUser', returnStdout: true).trim()
-                        env.DOCKER_PASSWORD = sh(script: 'echo $dockerHubPass', returnStdout: true).trim()
+                        env.DOCKER_USERNAME = sh(script: 'echo \$dockerHubUser', returnStdout: true).trim()
+                        env.DOCKER_PASSWORD = sh(script: 'echo \$dockerHubPass', returnStdout: true).trim()
 
                         // Log in to Docker Hub
                         sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
