@@ -20,14 +20,20 @@ pipeline {
                 echo 'image scanning ho gayi'
             }
         }
-        stage("push"){
-            steps{
-               // Retrieve Docker Hub credentials from Jenkins credentials store
+        
+        stage('Push') {
+            environment {
+                DOCKER_USERNAME = ""
+                DOCKER_PASSWORD = ""
+            }
+            steps {
+                script {
+                    // Retrieve Docker Hub credentials from Jenkins credentials store
                     withCredentials([usernamePassword(credentialsId: 'dockerHub', passwordVariable: 'dockerHubPass', usernameVariable: 'dockerHubUser')]) {
                         
                         // Set environment variables
-                        env.DOCKER_USERNAME = sh(script: 'echo \$dockerHubUser', returnStdout: true).trim()
-                        env.DOCKER_PASSWORD = sh(script: 'echo \$dockerHubPass', returnStdout: true).trim()
+                        DOCKER_USERNAME = sh(script: 'echo \${DOCKERHUB_USER}', returnStdout: true).trim()
+                        DOCKER_PASSWORD = sh(script: 'echo \${DOCKERHUB_PASS}', returnStdout: true).trim()
 
                         // Log in to Docker Hub
                         sh "docker login -u ${DOCKER_USERNAME} -p ${DOCKER_PASSWORD}"
@@ -35,10 +41,11 @@ pipeline {
                         // Build and push Docker image
                         sh "docker tag node-app-test-new:latest ${DOCKER_USERNAME}/node-app-test-new:latest"
                         sh "docker push ${DOCKER_USERNAME}/node-app-test-new:latest"
-                        echo 'image push ho gaya'
+                    }
                 }
             }
         }
+
         stage("deploy"){
             steps{
                 sh "docker-compose down && docker-compose up -d"
